@@ -1,0 +1,23 @@
+version: '3.1'
+
+services:
+
+  yourls:
+    container_name: yourls
+    image: yourls
+    restart: always
+    ports:
+      - 80:80
+    environment:
+      YOURLS_DB_HOST: 172.31.21.77:32306
+      YOURLS_DB_USER: yourls
+      YOURLS_DB_PASS: 421fsfaIKdJ
+      YOURLS_DB_NAME: yourls
+      YOURLS_SITE: http://u.18-poker.com
+      YOURLS_USER: yourls
+      YOURLS_PASS: 1A@sfaIKdJ
+      YOURLS_HOURS_OFFSET: +8
+      YOURLS_LANG: zh_CN
+    volumes:
+      - /usr/share/zoneinfo/Asia/Shanghai:/etc/localtime
+      - ./QRcode:/var/www/html/user/plugins/QRcode

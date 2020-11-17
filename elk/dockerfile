@@ -1,0 +1,11 @@
+FROM sebp/elk
+MAINTAINER ZhangYu
+
+ADD ./02-beats-input.conf /etc/logstash/conf.d/02-beats-input.conf
+ADD ./redis-sping.conf /etc/logstash/conf.d/redis-sping.conf
+#ADD ./crontab /etc/crontab
+#ADD ./Clean.sh /
+ADD ./start.sh /usr/local/bin/start.sh
+
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+	&& apt-get install redis-server -y 

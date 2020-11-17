@@ -1,0 +1,32 @@
+FROM python:3.7.3-alpine
+ADD requretment.txt /
+RUN apk update && apk add --no-cache \
+        gcc \
+        curl \
+        musl-dev \
+        libxslt-dev \
+        libuuid \
+        pcre \
+        mailcap \
+        libc-dev \
+        linux-headers \
+        pcre-dev \
+		nginx \ 
+		tzdata \
+        && pip install --no-cache-dir -r requretment.txt  -i https://pypi.tuna.tsinghua.edu.cn/simple/ \
+        && rm -rf /tmp/* \
+        && sed -i 's/params.items(),/params.items()/g' /usr/local/lib/python3.7/site-packages/django/contrib/admin/widgets.py \
+		&& mkdir /run/nginx \
+        && cp /usr/share/zoneinfo/Asia/Shanghai  /etc/localtime && echo "Asia/shanghai" > /etc/timezone
+
+ADD ./friends_ios /friends_ios
+ADD run.sh /friends_ios/fridens
+ADD qcjy.conf /etc/nginx/conf.d/default.conf 
+WORKDIR /friends_ios/fridens
+
+HEALTHCHECK --interval=5s --timeout=2s --retries=12 \
+  CMD curl --silent --fail  -L -o /dev/null -s localhost:8001
+
+
+EXPOSE 80
+CMD /bin/sh run.sh

@@ -1,0 +1,12 @@
+version: '3.4'
+services: 
+  friends_ios:
+    image: registry.cn-hongkong.aliyuncs.com/kube-zy/friends_ios:13
+    container_name: friends_ios
+    restart: always
+    logging:
+      driver: "json-file"
+      options: 
+        max-size: "5m"
+    ports:
+      - "8001:80"

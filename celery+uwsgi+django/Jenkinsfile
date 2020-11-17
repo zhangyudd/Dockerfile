@@ -1,0 +1,70 @@
+pipeline {
+  agent any
+    options {
+        timeout(time: 1, unit: 'HOURS')
+    }
+  environment{
+    def profile_name = "friends_ios"
+    def profile_dir = "/home/apps/tomcat-8/jenkins/workspace/${profile_name}"
+	def docker_dir = "/home/apps/docker_volume/${profile_name}"
+	def docker_image = "mugroup/${profile_name}"
+  }
+  stages{
+    stage('git pull'){
+     steps{
+      // 拉取代码
+      // cleanWs()
+      git credentialsId: '82c564f2-73c8-4c1b-a671-6f442cbeb63f', url: 'https://gitee.com/xiaomanyu/friends_ios.git'
+     }
+    }
+    stage('docker build'){ 
+      // docker构建镜像
+	  steps{		  	    
+		  sh '''
+		  rm -rf ${docker_dir}/${profile_name} && cp -R ${profile_dir} ${docker_dir}/
+		  cd $docker_dir && docker build -t ${docker_image}:$BUILD_ID .	 
+		  docker images | grep ${docker_image} | awk '{cmd="docker rmi";if(NR>3)system(cmd " " \$1":"\$2)}' 
+		  '''      
+	  }
+	}
+	stage('docker image push'){ 
+	  steps{
+		withCredentials([usernamePassword(credentialsId: 'c73558a3-a5db-4458-9442-f749a5c9397e', passwordVariable: 'dockerPassword', usernameVariable: 'dockerUser')]) {
+	      sh '''
+		  docker login -u ${dockerUser} -p ${dockerPassword} 
+		  docker push ${docker_image}:$BUILD_ID		  
+          '''
+		}
+	  }
+	}
+	stage('docker deoloy'){
+	  steps{
+	    withCredentials([usernamePassword(credentialsId: 'c73558a3-a5db-4458-9442-f749a5c9397e', passwordVariable: 'dockerPassword', usernameVariable: 'dockerUser')]) {
+sh """
+cat > docker-compose.yaml <<-'EOF'
+version: '3.4'
+services: 
+  ${profile_name}:
+    image: ${docker_image}:$BUILD_ID
+    container_name: ${profile_name}
+    logging:
+      driver: "json-file"
+      options: 
+        max-size: "5m"
+    ports:
+      - "8001:80"
+EOF
+cat > ${profile_name}.sh <<-'EOF'
+docker images | grep ${docker_image} | awk '{cmd="docker rmi";if(NR>3)system(cmd " " \$1":"\$2)}' 
+EOF
+ansible qcjy -m copy -a "src=docker-compose.yaml dest=/data/shell/${profile_name}/docker-compose.yaml mode=0755"
+ansible qcjy -m copy -a "src=${profile_name}.sh dest=/data/shell/${profile_name}/${profile_name}.sh mode=0755"
+ansible qcjy -m shell -a "docker login -u ${dockerUser} -p ${dockerPassword}  && cd /data/shell/${profile_name} && docker-compose stop && docker-compose up -d --build"
+ansible qcjy -m shell -a "/data/shell/${profile_name}/${profile_name}.sh"
+"""
+		}	    
+	  }
+	}
+	
+  }
+}

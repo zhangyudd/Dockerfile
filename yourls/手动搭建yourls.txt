@@ -1,0 +1,80 @@
+采用nginx+php+mysql架构
+1、搭建php、mysql及nginx服务器
+2、提取yourls代码，修改配置
+	git clone  https://github.com/YOURLS/YOURLS.git
+	cd YOURLS/user/ && cp config-sample.php config.php
+	
+	配置文件修改：
+	<?php
+	define( 'YOURLS_DB_USER', 'yourls' );    # yourls 数据库账号
+	define( 'YOURLS_DB_PASS', 'mysqlPassword' );    # yourls 数据库密码
+	define( 'YOURLS_DB_NAME', 'yourls' );    # yourls 数据库名
+	define( 'YOURLS_DB_HOST', '172.31.21.77:32306' );    # yourls 数据库连接地址
+	define( 'YOURLS_DB_PREFIX', 'yourls_' );
+	define( 'YOURLS_SITE', 'https://u.18-poker.com' );    # yourls 站点名称
+	define( 'YOURLS_HOURS_OFFSET', 8 );    
+	define( 'YOURLS_LANG', 'zh_CN' ); 
+	define( 'YOURLS_UNIQUE_URLS', true );
+	define( 'YOURLS_PRIVATE', true );
+	define( 'YOURLS_COOKIEKEY', '9{G6Fm[Jrr652$%4cy)q#xs1FhpC-aL|dWNbFr#p' );		#获取地址 http://yourls.org/cookie
+	$yourls_user_passwords = array(
+			'yourls' => 'yourlsPassword',    # yourls 登录账号密码
+			// 'username2' => 'password2',
+			// You can have one or more 'login'=>'password' lines
+			);
+	define( 'YOURLS_DEBUG', false );
+	
+	define( 'YOURLS_URL_CONVERT', 62 );
+	$yourls_reserved_URL = array(
+			'porn', 'faggot', 'sex', 'nigger', 'fuck', 'cunt', 'dick',
+	);
+	
+	
+3、配置nginx
+
+server {
+        listen       80;
+        server_name  u.pokerclubs.ca;
+        root   /data/YOURLS_pokerclubs;
+
+   location / {
+    index index.php;
+    try_files $uri $uri/ /yourls-loader.php$is_args$args;
+  }
+   location ~ \.php$ {
+    include fastcgi.conf;
+    fastcgi_index index.php;
+    fastcgi_pass 127.0.0.1:9000;
+    }
+}
+
+server {
+        listen       443 ssl http2;
+        server_name  u.pokerclubs.ca;
+        root   /data/YOURLS_pokerclubs;
+
+        ssl_certificate /data/nginx/key/u.pokerclubs.ca.pem;
+        ssl_certificate_key /data/nginx/key/u.pokerclubs.ca.key;
+        ssl_protocols TLSv1 TLSv1.1 TLSv1.2; #允许的协议
+        ssl_ciphers EECDH+CHACHA20:EECDH+AES128:RSA+AES128:EECDH+AES256:RSA+AES256:EECDH+3DES:RSA+3DES:!MD5; #加密算法(CloudFlare 推荐的加密套件组)
+        ssl_prefer_server_ciphers on; #优化 SSL 加密套件
+        ssl_session_timeout 10m; #客户端会话缓存时间
+        ssl_session_cache builtin:1000 shared:SSL:10m; #SSL 会话缓存类型和大小
+        ssl_buffer_size 1400; # 1400 bytes to fit in one MTU
+        add_header Strict-Transport-Security max-age=15768000;
+        ssl_stapling on;
+        ssl_stapling_verify on;
+   location / {
+    index index.php;
+    try_files $uri $uri/ /yourls-loader.php$is_args$args;
+  }
+   location ~ \.php$ {
+    include fastcgi.conf;
+    fastcgi_index index.php;
+    fastcgi_pass 127.0.0.1:9000;
+    }
+}	
+
+4、安装登录
+	访问安装： https://u.pokerclubs.ca/install.php
+	访问登录： https://u.pokerclubs.ca/index.php

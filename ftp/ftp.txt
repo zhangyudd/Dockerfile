@@ -1,0 +1,8 @@
+磁盘通过挂载nas磁盘到/data/ftp
+
+docker run -d -p 40022:20 -p 40023:21 -p 60101-60110:60101-60110 -v /data/ftp/dipute-test-ftp:/home/vsftpd -e FTP_USER=dispute-ftp-test -e FTP_PASS=hq1qShYZA0hN -e PASV_ADDRESS=47.94.81.235 -e PASV_MIN_PORT=60101 -e PASV_MAX_PORT=60110 --name ftp-test --restart=always fauria/vsftpd
+
+
+
+
+docker run -d -p 40020:20 -p 40021:21 -p 60000-60100:60000-60100 -v /data/ftp/dispute-ftp:/home/vsftpd -e FTP_USER=dispute-ftp -e FTP_PASS=52CXU94OUtHG -e PASV_ADDRESS=47.94.81.235 -e PASV_MIN_PORT=60000 -e PASV_MAX_PORT=60100 --name ftp --restart=always fauria/vsftpd
