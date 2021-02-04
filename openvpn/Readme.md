@@ -78,4 +78,8 @@ client-cert-not-required
 
 
 ## 连接vpn后无法上网
-    暂时判断为虚拟机环境问题，暂不解决
+* 服务端
+    net.ipv4.ip_forward = 1
+* 客户端配置文件添加
+    route 172.21.0.0 255.255.255.0 # 只有访问这个网段走vpn
+    route-nopull # 添加这一行，不从服务器拉取路由表
