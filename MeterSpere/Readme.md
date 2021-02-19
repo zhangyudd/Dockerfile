@@ -12,6 +12,10 @@
     安装路径：/opt/
     端口配置：通过进入到/opt/，修改yaml，配置具体的映射端口
     启动停止：通过docker-compose操作
+### 访问
+    地址: http://目标服务器IP地址:8081
+    用户名: admin
+    密码: metersphere
 
 ## 配置使用
     配置外显url、邮件、LDAP：设置-系统-系统参数设置
