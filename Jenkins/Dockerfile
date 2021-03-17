@@ -1,4 +1,4 @@
-  FROM zhangyudd/openjdk8-alpine:jdk8-alpine
+FROM zhangyudd/openjdk8-alpine:jdk8-alpine
 
 LABEL maintainer="Jenkins Docker Maintainers <edgar.z@foxmail.com>"
 
