@@ -1,40 +1,20 @@
 ﻿## Jumpserver Docker-Compose
 
-```sh
-git clone https://github.com/jumpserver/Dockerfile.git
-cd Dockerfile
-cat .env
-查看并修改docker-compose.yaml,包括映射路径，及外部mysql、redis
-cat docker-compose.yaml
-docker-compose up
-```
+curl -sSL https://github.com/jumpserver/jumpserver/releases/download/v2.7.1/quick_start.sh | bash -s -- 2.7.1
 
-build
-```sh
-cd Dockerfile
-cat .env
-docker-compose -f docker-compose-build.yml up
-```
-## 说明
+此过程下载安装镜像默认存储位置/opt
 
-- .env 的变量 用在 docker-compose 里面, 可以自己看下
-可能还有一些未能检测到的问题, 尽量自己调试一遍后再使用
+cd /opt
 
-> 如果自己编译, 可以在 docker-compose 的 environment: 处加入 Version: $Version , 取代 Dockerfile 的 ARG
+mv jumpserver-installer-v2.8.0 /data/
 
-## 外置 数据库 和 redis
+查看帮助
+./jmsctl.sh --help
 
-- mysql server
+定义是否使用外部数据库、redis、存储位置
+./jmsctl.sh install
 
-```mysql
-create database jumpserver default charset 'utf8' collate 'utf8_bin';
-grant all on jumpserver.* to 'jumpserver'@'%' identified by 'weakPassword';
-```
+启动
+./jmsctl.sh start
 
-- 然后在 .env 里面定义 mysql 和 redis
-
-```sh
-cd Dockerfile
-vi .env
-docker-compose -f docker-compose-external.yml up
-```
+访问8080端口
