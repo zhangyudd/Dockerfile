@@ -1,0 +1,16 @@
+version: '3.1'
+
+services:
+  # 开源得书签管理器，h5页面
+  onenav:
+    container_name: onenav
+    image: helloz/onenav
+    restart: always
+    ports:
+      - 31100:80
+    environment:
+      USER: 'admin'
+      PASSWORD: 'LVztWCVVMnn3dSDb'
+    volumes:
+      - /usr/share/zoneinfo/Asia/Shanghai:/etc/localtime
+      - ./onenav:/data/wwwroot/default/data
